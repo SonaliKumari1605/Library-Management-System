@@ -58,6 +58,12 @@ def main_menu_screen():
         else:
             messagebox.showerror("Error", "Access denied")
 
+    def go_to_user_management():
+        if logged_in_role == "admin":
+            manage_users_screen()
+        else:
+            messagebox.showerror("Error", "Access denied")
+
     def go_to_transactions():
         transactions_screen()
 
@@ -66,7 +72,8 @@ def main_menu_screen():
 
     tk.Label(root, text="Library Management System", font=("Arial", 20)).pack(pady=20)
     
-    tk.Button(root, text="Maintenance (Admin only)", command=go_to_books).pack(pady=10)
+    tk.Button(root, text="Manage Books (Admin only)", command=go_to_books).pack(pady=10)
+    tk.Button(root, text="Manage Users (Admin only)", command=go_to_user_management).pack(pady=10)
     tk.Button(root, text="Transactions", command=go_to_transactions).pack(pady=10)
     tk.Button(root, text="Reports", command=go_to_reports).pack(pady=10)
     tk.Button(root, text="Logout", command=login_screen).pack(pady=10)
@@ -81,11 +88,25 @@ def manage_books_screen():
         if title and author:
             books.append({"title": title, "author": author, "available": True})
             messagebox.showinfo("Success", "Book added successfully")
-            main_menu_screen()
+            entry_title.delete(0, tk.END)
+            entry_author.delete(0, tk.END)
         else:
             messagebox.showerror("Error", "All fields are mandatory")
 
-    tk.Label(root, text="Add Book", font=("Arial", 20)).pack(pady=20)
+    def remove_book():
+        title = entry_remove_title.get()
+        for book in books:
+            if book["title"] == title:
+                books.remove(book)
+                messagebox.showinfo("Success", "Book removed successfully")
+                entry_remove_title.delete(0, tk.END)
+                return
+        messagebox.showerror("Error", "Book not found")
+
+    tk.Label(root, text="Manage Books", font=("Arial", 20)).pack(pady=20)
+    
+    # Adding a new book
+    tk.Label(root, text="Add Book", font=("Arial", 16)).pack(pady=10)
     
     tk.Label(root, text="Title").pack(pady=5)
     entry_title = tk.Entry(root)
@@ -95,7 +116,79 @@ def manage_books_screen():
     entry_author = tk.Entry(root)
     entry_author.pack(pady=5)
     
-    tk.Button(root, text="Add Book", command=add_book).pack(pady=20)
+    tk.Button(root, text="Add Book", command=add_book).pack(pady=10)
+    
+    # Removing a book
+    tk.Label(root, text="Remove Book", font=("Arial", 16)).pack(pady=10)
+    
+    tk.Label(root, text="Title").pack(pady=5)
+    entry_remove_title = tk.Entry(root)
+    entry_remove_title.pack(pady=5)
+    
+    tk.Button(root, text="Remove Book", command=remove_book).pack(pady=10)
+    
+    tk.Button(root, text="Back", command=main_menu_screen).pack(pady=10)
+
+# Manage Users Screen
+def manage_users_screen():
+    clear_screen()
+
+    def add_user():
+        username = entry_username.get()
+        password = entry_password.get()
+        role = entry_role.get()
+        
+        if username and password and role:
+            # Check if the username already exists
+            if any(user["username"] == username for user in users):
+                messagebox.showerror("Error", "Username already exists")
+                return
+            
+            users.append({"username": username, "password": password, "role": role})
+            messagebox.showinfo("Success", "User added successfully")
+            entry_username.delete(0, tk.END)
+            entry_password.delete(0, tk.END)
+            entry_role.delete(0, tk.END)
+        else:
+            messagebox.showerror("Error", "All fields are mandatory")
+
+    def remove_user():
+        username = entry_remove_user.get()
+        for user in users:
+            if user["username"] == username:
+                users.remove(user)
+                messagebox.showinfo("Success", "User removed successfully")
+                entry_remove_user.delete(0, tk.END)
+                return
+        messagebox.showerror("Error", "User not found")
+
+    tk.Label(root, text="Manage Users", font=("Arial", 20)).pack(pady=20)
+
+    # Adding a new user
+    tk.Label(root, text="Add User", font=("Arial", 16)).pack(pady=10)
+
+    tk.Label(root, text="Username").pack(pady=5)
+    entry_username = tk.Entry(root)
+    entry_username.pack(pady=5)
+
+    tk.Label(root, text="Password").pack(pady=5)
+    entry_password = tk.Entry(root, show="*")
+    entry_password.pack(pady=5)
+
+    tk.Label(root, text="Role").pack(pady=5)
+    entry_role = tk.Entry(root)
+    entry_role.pack(pady=5)
+
+    tk.Button(root, text="Add User", command=add_user).pack(pady=10)
+
+    # Removing a user
+    tk.Label(root, text="Remove User", font=("Arial", 16)).pack(pady=10)
+
+    tk.Label(root, text="Username").pack(pady=5)
+    entry_remove_user = tk.Entry(root)
+    entry_remove_user.pack(pady=5)
+
+    tk.Button(root, text="Remove User", command=remove_user).pack(pady=10)
     tk.Button(root, text="Back", command=main_menu_screen).pack(pady=10)
 
 # Transactions Screen
